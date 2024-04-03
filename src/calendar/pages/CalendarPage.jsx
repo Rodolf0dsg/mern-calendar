@@ -6,45 +6,52 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { localizer, getMessagesES } from '../../helpers';
 
 import { CalendarEvent, CalendarModal, FabAddNew, FabDelete, NavBar  } from '../';
-import { useUiStore, useCalendarStore } from '../../hooks';
+import { useUiStore, useCalendarStore, useAuthStore } from '../../hooks';
+import { useEffect } from 'react';
 
 export const CalendarPage = () => {
 
+  const { user } = useAuthStore();
   const { openDateModal } = useUiStore();
-  const { events, activeEvent,setActiveEvent } = useCalendarStore();
+  const { events, activeEvent,setActiveEvent, startLoadingEvents } = useCalendarStore();
 
   const [lastView, setLastView] = useState( localStorage.getItem('lastView') || 'month')
 
-      const eventStyleGetter = ( event, start, end, isSelected ) => {
-        // console.log({event, start, end, isSelected})
-      
-        const style = {
-          backgroundColor: '#347CF7',
-          borderRadius: '0px',
-          opacity: 0.8,
-          color: 'white',
-        }
-      
-        return {
-          style
-        }
-      }
+  const eventStyleGetter = ( event, start, end, isSelected ) => {
+    // console.log({event, start, end, isSelected});
 
-      const onDoubleClick = ( event ) => {
-        console.log({onDoubleClick: event})
-        openDateModal();
-      }
+    const isMyEvent = ( user.uid === event.user._id) || ( user.uid === event.user.uid);
   
-      const onSelect = ( event ) => {
-        console.log({click: event });
-        setActiveEvent( event );
-      }
+     const style = {
+      backgroundColor:  isMyEvent ? '#347CF7' : '#465660',
+      borderRadius: '0px',
+      opacity: 0.8,
+      color: 'white',
+    }
   
-      const onViewChanged = ( event )=> {
-        localStorage.setItem( 'lastView', event );
-        setLastView( event )
-      }
+    return {
+      style
+    }
+  }
 
+  const onDoubleClick = ( event ) => {
+    console.log({onDoubleClick: event})
+    openDateModal();
+  }
+  const onSelect = ( event ) => {
+    console.log({click: event });
+    setActiveEvent( event );
+  }
+  const onViewChanged = ( event )=> {
+    localStorage.setItem( 'lastView', event );
+    setLastView( event )
+  }
+
+  useEffect(() => {
+    startLoadingEvents();
+  },[]);
+
+  
   return (
     <>
       <NavBar />

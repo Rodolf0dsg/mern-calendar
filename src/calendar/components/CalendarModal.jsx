@@ -91,11 +91,10 @@ export const CalendarModal = () => {
             return;
         }
 
-        if ( formValues.title.length <= 0 ) return;
-
-        
+        if ( formValues.title.length <= 0 ) return;    
 
         //TODO: cerrar modal y guardar
+        
         await startSavingEvent( formValues );
         closeDateModal();
         setFormSubmitted( false );
